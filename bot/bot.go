@@ -9,6 +9,7 @@ import (
     "os/exec"
     "os/signal"
     "strings"
+    "zombot/parser"
 )
 
 var (
@@ -35,6 +36,8 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
 
         case strings.Contains(message.Content, CommandPrefix +"bot"):
             discord.ChannelMessageSend(message.ChannelID, "Zombot!")
+        case strings.Contains(message.Content, CommandPrefix +"logouts"):
+            parser.ReadLogFile("./sample_log.txt")
     }
 }
 
