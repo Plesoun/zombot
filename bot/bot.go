@@ -26,6 +26,13 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
         // list all commands here TODO: maybe some better structure
         case strings.Contains(message.Content, CommandPrefix + "help"):
             discord.ChannelMessageSend(message.ChannelID, "Available commands: \n !help \n !status \n !logouts \n !logins \n !system")
+        // system returns basic system stats
+        case strings.Contains(message.Content, CommandPrefix +"system"):
+            out, err := exec.Command("bash", "-c", "top -b -n 1 | egrep 'top -|Tasks:|%Cpu|MiB'").Output()
+            if err != nil {
+                log.Fatal("Encountered error while executing system command: ", err)
+            }
+            discord.ChannelMessageSend(message.ChannelID, string(out[:]))
         // status returns the systemd status section relevant to the query
         case strings.Contains(message.Content, CommandPrefix +"status"):
             out, err := exec.Command("bash", "-c", "sudo systemctl status docker | grep Active").Output()
