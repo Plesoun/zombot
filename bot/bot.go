@@ -23,21 +23,22 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
     }
     // if not, respond
     switch {
+        // list all commands here TODO: maybe some better structure
         case strings.Contains(message.Content, CommandPrefix + "help"):
-            discord.ChannelMessageSend(message.ChannelID, "Available commands: \n !help \n !status \n !logouts \n !logins")
+            discord.ChannelMessageSend(message.ChannelID, "Available commands: \n !help \n !status \n !logouts \n !logins \n !system")
+        // status returns the systemd status section relevant to the query
         case strings.Contains(message.Content, CommandPrefix +"status"):
             out, err := exec.Command("bash", "-c", "sudo systemctl status docker | grep Active").Output()
             if err != nil {
                 log.Fatal("Encountered error while executing system command: ", err)
             }
             discord.ChannelMessageSend(message.ChannelID, string(out[:]))
-
-        case strings.Contains(message.Content, CommandPrefix +"bot"):
-            discord.ChannelMessageSend(message.ChannelID, "Zombot!")
+        // see all logouts contained in the current log file TODO: limit to ~ last 10
         case strings.Contains(message.Content, CommandPrefix +"logouts"):
             for _, line := range parser.ProcessLogFile("./sample_log.txt", "[disconnect]") {
                 discord.ChannelMessageSend(message.ChannelID, line)
             }
+        // see all logins contained in the current log file TODO: limit to ~ last 10
         case strings.Contains(message.Content, CommandPrefix +"logins"):
             for _, line := range parser.ProcessLogFile("./sample_log.txt", "[fully-connected]") {
                 discord.ChannelMessageSend(message.ChannelID, line)
