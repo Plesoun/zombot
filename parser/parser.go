@@ -8,24 +8,29 @@ import (
     "strings"
 )
 
-func ReadLogFile(filePath string) []string {
+func readLogFile(filePath string) *bufio.Scanner {
+    // Read file into a buffio Scanner object/iterator
     cont, err := os.Open(filePath)
     if err != nil {
         log.Fatal("An error occured while reading a log file: ", err)
     }
-    lines := bufio.NewScanner(cont)
+    return bufio.NewScanner(cont)
+}
+
+func parseLogFile(lines *bufio.Scanner, keyword string) []string {
+    // keyword from logs, for example -> "[disconnect]"
     lines.Split(bufio.ScanLines)
     var fileLines []string
     for lines.Scan() {
-        if strings.Contains(lines.Text(), "[disconnect]") == true {
+        if strings.Contains(lines.Text(), keyword) == true {
             fileLines = append(fileLines, strings.Split(lines.Text(), "] ")[0] + "] " + strings.Split(lines.Text(), "username=")[1])
         }
     }
-    cont.Close()
     fmt.Println(fileLines)
     return fileLines
-//
-//    for _, line := range fileLines {
-//        fmt.Println(line)
-//    }
+}
+
+func ProcessLogFile(filePath string, keyword string) []string {
+    lines := readLogFile(filePath)
+    return parseLogFile(lines, keyword)
 }

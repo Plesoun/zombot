@@ -37,7 +37,7 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
         case strings.Contains(message.Content, CommandPrefix +"bot"):
             discord.ChannelMessageSend(message.ChannelID, "Zombot!")
         case strings.Contains(message.Content, CommandPrefix +"logouts"):
-            for _, line := range parser.ReadLogFile("./sample_log.txt") {
+            for _, line := range parser.ProcessLogFile("./sample_log.txt", "[disconnect]") {
                 discord.ChannelMessageSend(message.ChannelID, line)
             }
     }
