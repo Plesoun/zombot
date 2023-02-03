@@ -24,13 +24,11 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
     // if not, respond
     switch {
         case strings.Contains(message.Content, CommandPrefix + "help"):
-            discord.ChannelMessageSend(message.ChannelID, "Available commands: \n !help \n !status \n !uptime \n !logouts")
-        case strings.Contains(message.Content, CommandPrefix + "status"):
-            discord.ChannelMessageSend(message.ChannelID, "Green")
-        case strings.Contains(message.Content, CommandPrefix +"uptime"):
-            out, err := exec.Command("bash", "-c", "sudo systemctl status docker | grep -Po '.*; \\K(.*)(?= ago)'").Output()
+            discord.ChannelMessageSend(message.ChannelID, "Available commands: \n !help \n !status \n !logouts \n !logins")
+        case strings.Contains(message.Content, CommandPrefix +"status"):
+            out, err := exec.Command("bash", "-c", "sudo systemctl status docker | grep Active").Output()
             if err != nil {
-                log.Fatal("%s", err)
+                log.Fatal("Encountered error while executing system command: ", err)
             }
             discord.ChannelMessageSend(message.ChannelID, string(out[:]))
 
@@ -40,11 +38,14 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
             for _, line := range parser.ProcessLogFile("./sample_log.txt", "[disconnect]") {
                 discord.ChannelMessageSend(message.ChannelID, line)
             }
+        case strings.Contains(message.Content, CommandPrefix +"logins"):
+            for _, line := range parser.ProcessLogFile("./sample_log.txt", "[fully-connected]") {
+                discord.ChannelMessageSend(message.ChannelID, line)
+            }
     }
 }
 
 func Run() {
-    // not implemented yet
     discord, err := discordgo.New("Bot " + DiscordBotToken)
     if err != nil {
         log.Fatal(err)
