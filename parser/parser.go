@@ -5,9 +5,10 @@ import (
     "fmt"
     "log"
     "os"
+    "strings"
 )
 
-func ReadLogFile(filePath string) {
+func ReadLogFile(filePath string) []string {
     cont, err := os.Open(filePath)
     if err != nil {
         log.Fatal("An error occured while reading a log file: ", err)
@@ -16,11 +17,15 @@ func ReadLogFile(filePath string) {
     lines.Split(bufio.ScanLines)
     var fileLines []string
     for lines.Scan() {
-        fileLines = append(fileLines, lines.Text())
+        if strings.Contains(lines.Text(), "[disconnect]") == true {
+            fileLines = append(fileLines, strings.Split(lines.Text(), "] ")[0] + "] " + strings.Split(lines.Text(), "username=")[1])
+        }
     }
     cont.Close()
-
-    for _, line := range fileLines {
-        fmt.Println(line)
-    }
+    fmt.Println(fileLines)
+    return fileLines
+//
+//    for _, line := range fileLines {
+//        fmt.Println(line)
+//    }
 }

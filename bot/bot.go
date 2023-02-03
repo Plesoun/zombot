@@ -2,7 +2,6 @@ package bot
 
 import (
 //    "bytes"
-    "fmt"
     "github.com/bwmarrin/discordgo"
     "log"
     "os"
@@ -24,6 +23,8 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
     }
     // if not, respond
     switch {
+        case strings.Contains(message.Content, CommandPrefix + "help"):
+            discord.ChannelMessageSend(message.ChannelID, "Available commands: \n !help \n !status \n !uptime \n !logouts")
         case strings.Contains(message.Content, CommandPrefix + "status"):
             discord.ChannelMessageSend(message.ChannelID, "Green")
         case strings.Contains(message.Content, CommandPrefix +"uptime"):
@@ -31,13 +32,14 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
             if err != nil {
                 log.Fatal("%s", err)
             }
-            fmt.Println(string(out[:]))
             discord.ChannelMessageSend(message.ChannelID, string(out[:]))
 
         case strings.Contains(message.Content, CommandPrefix +"bot"):
             discord.ChannelMessageSend(message.ChannelID, "Zombot!")
         case strings.Contains(message.Content, CommandPrefix +"logouts"):
-            parser.ReadLogFile("./sample_log.txt")
+            for _, line := range parser.ReadLogFile("./sample_log.txt") {
+                discord.ChannelMessageSend(message.ChannelID, line)
+            }
     }
 }
 
