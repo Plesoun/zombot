@@ -1,7 +1,6 @@
 package bot
 
 import (
-//    "bytes"
     "github.com/bwmarrin/discordgo"
     "log"
     "os"
@@ -26,7 +25,7 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
         // list all commands here TODO: maybe some better structure
         case strings.Contains(message.Content, CommandPrefix + "help"):
             discord.ChannelMessageSend(message.ChannelID, "Available commands: \n !help \n !status \n !logouts \n !logins \n !system")
-        // system returns basic system stats
+        // system returns basic system stats from "top"
         case strings.Contains(message.Content, CommandPrefix +"system"):
             out, err := exec.Command("bash", "-c", "top -b -n 1 | egrep 'top -|Tasks:|%Cpu|MiB'").Output()
             if err != nil {
