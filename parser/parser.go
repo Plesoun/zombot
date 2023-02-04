@@ -3,6 +3,7 @@ package parser
 import (
     "bufio"
     "fmt"
+    "github.com/bwmarrin/discordgo"
     "log"
     "os"
     "strconv"
@@ -28,16 +29,20 @@ func readLogFile(filePath string) *bufio.Scanner {
     return bufio.NewScanner(cont)
 }
 
-func parseLogFile(lines *bufio.Scanner, keyword string) []string {
+func parseLogFile(lines *bufio.Scanner, keyword string) {
     // keyword from logs, for example -> "[disconnect]"
+    restruct := make(map[string]string)
     lines.Split(bufio.ScanLines)
     var fileLines []string
     for lines.Scan() {
         if strings.Contains(lines.Text(), keyword) == true {
+            restruct["1"] = strings.Split(lines.Text(), ">")[3]
             fileLines = append(fileLines, strings.Split(lines.Text(), "] ")[0] + "] " + strings.Split(lines.Text(), "username=")[1])
         }
     }
-    return fileLines
+    fmt.Print(restruct)
+//    return &discordgo.MessageSend{
+//        Content: fileLines,
 }
 
 func getHordeSize(lines *bufio.Scanner, keyword string) []string {

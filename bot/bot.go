@@ -41,14 +41,14 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
             discord.ChannelMessageSend(message.ChannelID, string(out[:]))
         // see all logouts contained in the current log file TODO: limit to ~ last 10
         case strings.Contains(message.Content, CommandPrefix +"logouts"):
-            for _, line := range parser.ProcessLogFile("/home/plesivsson/Zomboid/Logs/24-01-23_15-47-00_DebugLog-server.txt", "[disconnect]") {
+            for _, line := range parser.ProcessLogFile("./log_examples/24-01-23_15-47-00_DebugLog-server.txt", "[disconnect]") {
                 discord.ChannelMessageSend(message.ChannelID, line)
             }
         // see all logins contained in the current log file TODO: limit to ~ last 10
         // TODO: file location and name should be configurable (rather directory containing logs should
         case strings.Contains(message.Content, CommandPrefix +"logins"):
-            for _, line := range parser.ProcessLogFile("/home/plesivsson/Zomboid/Logs/24-01-23_15-47-00_DebugLog-server.txt", "[fully-connected]") {
-                discord.ChannelMessageSend(message.ChannelID, line)
+            for _, line := range parser.ProcessLogFile("./log_examples/24-01-23_15-47-00_DebugLog-server.txt", "[fully-connected]") {
+                discord.ChannelMessageSendComplex(message.ChannelID, line)
             }
         case strings.Contains(message.Content, CommandPrefix +"lasthorde"):
             line := parser.ProcessLogFile("./log_examples/24-01-23_15-47-00_DebugLog-server.txt", "wave")
