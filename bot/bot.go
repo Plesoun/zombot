@@ -24,7 +24,7 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
     switch {
         // list all commands here TODO: maybe some better structure
         case strings.Contains(message.Content, CommandPrefix + "help"):
-            discord.ChannelMessageSend(message.ChannelID, "Available commands: \n !help \n !status \n !logouts \n !logins \n !system \n !horde")
+            discord.ChannelMessageSend(message.ChannelID, "Available commands: \n !help \n !status \n !logouts \n !logins \n !system \n !lasthorde")
         // system returns basic system stats from "top"
         case strings.Contains(message.Content, CommandPrefix +"system"):
             out, err := exec.Command("bash", "-c", "top -b -n 1 | egrep 'top -|Tasks:|%Cpu|MiB'").Output()
@@ -50,7 +50,7 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
             for _, line := range parser.ProcessLogFile("/home/plesivsson/Zomboid/Logs/24-01-23_15-47-00_DebugLog-server.txt", "[fully-connected]") {
                 discord.ChannelMessageSend(message.ChannelID, line)
             }
-        case strings.Contains(message.Content, CommandPrefix +"horde"):
+        case strings.Contains(message.Content, CommandPrefix +"lasthorde"):
             line := parser.ProcessLogFile("./log_examples/24-01-23_15-47-00_DebugLog-server.txt", "wave")
                 discord.ChannelMessageSend(message.ChannelID, line[len(line)-1])
     }

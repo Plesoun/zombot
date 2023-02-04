@@ -46,7 +46,7 @@ func getHordeSize(lines *bufio.Scanner, keyword string) []string {
     var fileLines []string
     for lines.Scan() {
         if strings.Contains(lines.Text(), keyword) == true {
-            fileLines = append(fileLines, lines.Text())
+            fileLines = append(fileLines, strings.Split(strings.Split(strings.Split(lines.Text(), ">")[2], " ")[4], ".")[0] + " zombies.")
         }
     }
     fmt.Print(fileLines)
