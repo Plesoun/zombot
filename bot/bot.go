@@ -51,9 +51,8 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
                 discord.ChannelMessageSend(message.ChannelID, line)
             }
         case strings.Contains(message.Content, CommandPrefix +"horde"):
-            for _, line := range parser.ProcessLogFile("/home/plesivsson/Zomboid/Logs/24-01-23_15-47-00_DebugLog-server.txt", "wave") {
-                discord.ChannelMessageSend(message.ChannelID, line)
-            }
+            line := parser.ProcessLogFile("./log_examples/24-01-23_15-47-00_DebugLog-server.txt", "wave")
+                discord.ChannelMessageSend(message.ChannelID, line[len(line)-1])
     }
 }
 
