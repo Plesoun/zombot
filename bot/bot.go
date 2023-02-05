@@ -52,7 +52,7 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
                 discord.ChannelMessageSend(message.ChannelID, line)
             }
         case strings.Contains(message.Content, CommandPrefix +"lasthorde"):
-            line := parser.ProcessLogFile("./log_examples/24-01-23_15-47-00_DebugLog-server.txt", "wave")
+            line := parser.ProcessLogFile(DebugLogLocation, "wave")
                 discord.ChannelMessageSend(message.ChannelID, line[len(line)-1])
     }
 }
