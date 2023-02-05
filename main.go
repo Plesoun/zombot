@@ -43,5 +43,6 @@ func main() {
 
     fmt.Println("Zomb!", config)
     bot.DiscordBotToken = config.Token
+    bot.DebugLogLocation = config.DebugLogLocation
     bot.Run()
 }

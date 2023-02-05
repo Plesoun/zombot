@@ -1,6 +1,7 @@
 package bot
 
 import (
+    "fmt"
     "github.com/bwmarrin/discordgo"
     "log"
     "os"
@@ -52,6 +53,7 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
                 discord.ChannelMessageSend(message.ChannelID, line)
             }
         case strings.Contains(message.Content, CommandPrefix +"lasthorde"):
+            fmt.Print(DebugLogLocation)
             line := parser.ProcessLogFile(DebugLogLocation, "wave")
                 discord.ChannelMessageSend(message.ChannelID, line[len(line)-1])
     }
