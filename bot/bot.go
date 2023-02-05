@@ -13,6 +13,7 @@ import (
 var (
     DiscordBotToken string
     CommandPrefix string
+    DebugLogLocation string
 )
 
 func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
@@ -32,7 +33,7 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
                 log.Fatal("Encountered error while executing system command: ", err)
             }
             discord.ChannelMessageSend(message.ChannelID, string(out[:]))
-        // status returns the systemd status section relevant to the query
+            // status returns the systemd status section relevant to the query
         case strings.Contains(message.Content, CommandPrefix +"status"):
             out, err := exec.Command("bash", "-c", "sudo systemctl status zomboid.service | grep Active").Output()
             if err != nil {
@@ -41,14 +42,14 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
             discord.ChannelMessageSend(message.ChannelID, string(out[:]))
         // see all logouts contained in the current log file TODO: limit to ~ last 10
         case strings.Contains(message.Content, CommandPrefix +"logouts"):
-            for _, line := range parser.ProcessLogFile("./log_examples/24-01-23_15-47-00_DebugLog-server.txt", "[disconnect]") {
+            for _, line := range parser.ProcessLogFile(DebugLogLocation, "[disconnect]") {
                 discord.ChannelMessageSend(message.ChannelID, line)
             }
         // see all logins contained in the current log file TODO: limit to ~ last 10
         // TODO: file location and name should be configurable (rather directory containing logs should
         case strings.Contains(message.Content, CommandPrefix +"logins"):
-            for _, line := range parser.ProcessLogFile("./log_examples/24-01-23_15-47-00_DebugLog-server.txt", "[fully-connected]") {
-                discord.ChannelMessageSendComplex(message.ChannelID, line)
+            for _, line := range parser.ProcessLogFile(DebugLogLocation, "[fully-connected]") {
+                discord.ChannelMessageSend(message.ChannelID, line)
             }
         case strings.Contains(message.Content, CommandPrefix +"lasthorde"):
             line := parser.ProcessLogFile("./log_examples/24-01-23_15-47-00_DebugLog-server.txt", "wave")

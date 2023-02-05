@@ -3,7 +3,7 @@ package parser
 import (
     "bufio"
     "fmt"
-    "github.com/bwmarrin/discordgo"
+//    "github.com/bwmarrin/discordgo"
     "log"
     "os"
     "strconv"
@@ -36,7 +36,7 @@ func parseLogFile(lines *bufio.Scanner, keyword string) {
     var fileLines []string
     for lines.Scan() {
         if strings.Contains(lines.Text(), keyword) == true {
-            restruct["1"] = strings.Split(lines.Text(), ">")[3]
+//            restruct["1"] = strings.Split(lines.Text(), ">")[3]
             fileLines = append(fileLines, strings.Split(lines.Text(), "] ")[0] + "] " + strings.Split(lines.Text(), "username=")[1])
         }
     }
@@ -65,7 +65,8 @@ func ProcessLogFile(filePath string, keyword string) []string {
         return getHordeSize(lines, keyword)
     // logins/logouts TODO: refactor
     case strings.Contains(keyword, "["):
-        return parseLogFile(lines, keyword)
+//        return parseLogFile(lines, keyword)
+        return nil
     }
     return nil
 }

@@ -11,6 +11,7 @@ import (
 type configStruct struct {
     Token     string
     BotPrefix string
+    DebugLogLocation string
 }
 
 var (
@@ -40,7 +41,7 @@ func main() {
         return
     }
 
-    fmt.Println("Zomb!")
+    fmt.Println("Zomb!", config)
     bot.DiscordBotToken = config.Token
     bot.Run()
 }
