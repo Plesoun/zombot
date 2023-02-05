@@ -18,7 +18,6 @@ var (
 )
 
 func readConfig() error {
-    log.Println("Reading config file")
     file, err := os.ReadFile("./config.json")
     if err != nil {
         log.Fatal("Error loading config file...", err.Error())
@@ -41,7 +40,7 @@ func main() {
         return
     }
 
-    fmt.Println("Zomb!", config.Token)
+    fmt.Println("Zomb!")
     bot.DiscordBotToken = config.Token
     bot.Run()
 }
