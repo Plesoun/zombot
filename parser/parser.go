@@ -2,7 +2,9 @@ package parser
 
 import (
     "bufio"
-    "fmt"
+    "github.com/bwmarrin/discordgo"
+
+    //    "fmt"
 //    "github.com/bwmarrin/discordgo"
     "log"
     "os"
@@ -16,11 +18,11 @@ func convertTimestamp(timestamp string) string {
     if err != nil {
         log.Fatal("Failed parsing timestamp: ", err)
     }
-    time := time.Unix(i, 0)
-    return time.Format("2023-01-02 15:04:05")
+    time := time.Unix(i, 0).Format(time.UnixDate)
+    return time
 }
 
-func readLogFile(filePath string) *bufio.Scanner {
+func ReadLogFile(filePath string) *bufio.Scanner {
     // Read file into a buffio Scanner object/iterator
     cont, err := os.Open(filePath)
     if err != nil {
@@ -29,18 +31,31 @@ func readLogFile(filePath string) *bufio.Scanner {
     return bufio.NewScanner(cont)
 }
 
-func parseLogFile(lines *bufio.Scanner, keyword string) {
-    // keyword from logs, for example -> "[disconnect]"
+func ParseLogFile(lines *bufio.Scanner, keyword string) map[string]string {
+    // keyword from logs, for example -> "[disconnect]" eventually use dedicated log (user.txt)
     restruct := make(map[string]string)
     lines.Split(bufio.ScanLines)
-    var fileLines []string
     for lines.Scan() {
         if strings.Contains(lines.Text(), keyword) == true {
-//            restruct["1"] = strings.Split(lines.Text(), ">")[3]
-            fileLines = append(fileLines, strings.Split(lines.Text(), "] ")[0] + "] " + strings.Split(lines.Text(), "username=")[1])
+            text := lines.Text()
+            key := strings.Split(strings.Split(text, "username=")[1], "connection-type")[0]
+            timestamp := convertTimestamp(strings.Split(strings.Split(text, " , ")[1], ">")[0][:10])
+            restruct[key] = timestamp
         }
     }
-    fmt.Print(restruct)
+    embed := &discordgo.MessageSend{
+        Embeds: []*discordgo.MessageEmbed{{
+            Type: discordgo.EmbedTypeRich,
+            Title: "Logins",
+            Description: "Last logins.",
+            Fields: []*discordgo.MessageEmbedField{
+                for _, line := restruct {
+                    name: line
+            },
+            },
+                }},
+                }
+    return restruct
 //    return &discordgo.MessageSend{
 //        Content: fileLines,
 }
@@ -54,19 +69,15 @@ func getHordeSize(lines *bufio.Scanner, keyword string) []string {
             fileLines = append(fileLines, strings.Split(strings.Split(strings.Split(lines.Text(), ">")[2], " ")[4], ".")[0] + " zombies.")
         }
     }
-    fmt.Print(fileLines)
     return fileLines
 }
 
 func ProcessLogFile(filePath string, keyword string) []string {
-    lines := readLogFile(filePath)
+    lines := ReadLogFile(filePath)
     switch {
     case keyword == "wave":
         return getHordeSize(lines, keyword)
-    // logins/logouts TODO: refactor
-    case strings.Contains(keyword, "["):
-//        return parseLogFile(lines, keyword)
-        return nil
+        // logins/logouts TODO: refactor
     }
     return nil
 }

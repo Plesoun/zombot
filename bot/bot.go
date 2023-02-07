@@ -49,9 +49,8 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
         // see all logins contained in the current log file TODO: limit to ~ last 10
         // TODO: file location and name should be configurable (rather directory containing logs should
         case strings.Contains(message.Content, CommandPrefix +"logins"):
-            for _, line := range parser.ProcessLogFile(DebugLogLocation, "[fully-connected]") {
-                discord.ChannelMessageSend(message.ChannelID, line)
-            }
+            data := parser.ParseLogFile(parser.ReadLogFile(DebugLogLocation), "[fully-connected]")
+                discord.ChannelMessageSendEmbed()
         case strings.Contains(message.Content, CommandPrefix +"lasthorde"):
             fmt.Print(DebugLogLocation)
             line := parser.ProcessLogFile(DebugLogLocation, "wave")
