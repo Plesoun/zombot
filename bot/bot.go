@@ -51,7 +51,7 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
         case strings.Contains(message.Content, CommandPrefix +"logins"):
             data := parser.ParseLogFile(parser.ReadLogFile(DebugLogLocation), "[fully-connected]")
                 discord.ChannelMessageSendEmbed()
-        case strings.Contains(message.Content, CommandPrefix +"lasthorde"):
+        case strings.Contains(messaommandPrefix +"lasthorde"):
             fmt.Print(DebugLogLocation)
             line := parser.ProcessLogFile(DebugLogLocation, "wave")
                 discord.ChannelMessageSend(message.ChannelID, line[len(line)-1])

@@ -3,15 +3,19 @@ package parser
 import (
     "bufio"
     "github.com/bwmarrin/discordgo"
-
-    //    "fmt"
-//    "github.com/bwmarrin/discordgo"
+    // There is a log/syslog package, explore that
     "log"
     "os"
     "strconv"
     "strings"
     "time"
 )
+
+type parsedLog struct {
+    timestamp   time.Time
+    name        string
+    event       string
+}
 
 func convertTimestamp(timestamp string) string {
     i, err := strconv.ParseInt(timestamp, 10, 64)
@@ -29,6 +33,15 @@ func ReadLogFile(filePath string) *bufio.Scanner {
         log.Fatal("An error occured while reading a log file: ", err)
     }
     return bufio.NewScanner(cont)
+}
+
+
+func ParseLogLine(line string) (parsedLog, error) {
+    var parsed parsedLog
+    parsed.timestamp = time.Date(2023, time.January, 30, 17, 36, 27, 0, time.UTC),
+    parsed.name = "Plesoun"
+    parsed.event = "fully connected"
+    return parsed
 }
 
 func ParseLogFile(lines *bufio.Scanner, keyword string) map[string]string {
