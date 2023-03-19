@@ -2,7 +2,9 @@ package parser
 
 import (
     "bufio"
-    "github.com/bwmarrin/discordgo"
+    "fmt"
+
+    //    "github.com/bwmarrin/discordgo"
     // There is a log/syslog package, explore that
     "log"
     "os"
@@ -12,9 +14,9 @@ import (
 )
 
 type parsedLog struct {
-    timestamp   time.Time
-    name        string
-    event       string
+    Timestamp   time.Time
+    Name        string
+    Event       string
 }
 
 func convertTimestamp(timestamp string) string {
@@ -37,11 +39,12 @@ func ReadLogFile(filePath string) *bufio.Scanner {
 
 
 func ParseLogLine(line string) (parsedLog, error) {
-    var parsed parsedLog
-    parsed.timestamp = time.Date(2023, time.January, 30, 17, 36, 27, 0, time.UTC),
-    parsed.name = "Plesoun"
-    parsed.event = "fully connected"
-    return parsed
+    var parsedLine parsedLog
+    parsedLine.Timestamp = time.Date(2023, time.January, 30, 17, 36, 27, 0, time.UTC)
+    parsedLine.Name = "Plesoun"
+    parsedLine.Event = "fully connected"
+    fmt.Println(parsedLine)
+    return parsedLine, nil
 }
 
 func ParseLogFile(lines *bufio.Scanner, keyword string) map[string]string {
@@ -56,18 +59,6 @@ func ParseLogFile(lines *bufio.Scanner, keyword string) map[string]string {
             restruct[key] = timestamp
         }
     }
-    embed := &discordgo.MessageSend{
-        Embeds: []*discordgo.MessageEmbed{{
-            Type: discordgo.EmbedTypeRich,
-            Title: "Logins",
-            Description: "Last logins.",
-            Fields: []*discordgo.MessageEmbedField{
-                for _, line := restruct {
-                    name: line
-            },
-            },
-                }},
-                }
     return restruct
 //    return &discordgo.MessageSend{
 //        Content: fileLines,
