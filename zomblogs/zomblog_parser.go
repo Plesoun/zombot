@@ -33,7 +33,7 @@ func ParseLogLine(line string) (parsedLog, error) {
     startIndex := strings.Index(line, "[")
     endIndex := strings.Index(line, "]")
     if startIndex == -1 || endIndex == -1 {
-        return parsedLine, errors.New("invalid log format (timestmap)")
+        return parsedLine, errors.New("invalid log format (timestamp)")
     }
     timestampStr := line[startIndex+1 : endIndex]
     timestamp, err := time.Parse("02-01-06 15:04:05", timestampStr[:len(timestampStr)-4])

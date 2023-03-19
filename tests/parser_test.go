@@ -1,6 +1,7 @@
 package tests
 
 import (
+    "errors"
     "testing"
     "time"
     "zombot/zomblogs"
@@ -34,5 +35,26 @@ func TestParseLogLine(t *testing.T) {
     }
     if result.Event != expected.Event {
         t.Errorf("Expected event: %v, got %v", expected.Event, result.Event)
+    }
+
+    errorCases := []struct {
+        logLine         string
+        expectedError   error
+    }{
+        {
+            logLine:        `[30-01-23 17:36:27.662] 76561197995472465 "Plesoun" connected (10156,6640,0).`,
+            expectedError:  errors.New("event not found"),
+        },
+        {
+            logLine:        `30-01-23 17:36:27.662] 76561197995472465 "Plesoun" fully connected (10156,6640,0).`,
+            expectedError:  errors.New("invalid log format (timestamp)"),
+        },
+    }
+
+    for _, testCase := range errorCases {
+        _, err := parser.ParseLogLine(testCase.logLine)
+        if err == nil || err.Error() != testCase.expectedError.Error() {
+            t.Errorf("Expected error: %v, got %v", testCase.expectedError, err)
+        }
     }
 }
