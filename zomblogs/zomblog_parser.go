@@ -2,13 +2,11 @@ package parser
 
 import (
     "bufio"
-    "fmt"
-
+    "errors"
     //    "github.com/bwmarrin/discordgo"
     // There is a log/syslog package, explore that
     "log"
     "os"
-    "strconv"
     "strings"
     "time"
 )
@@ -17,15 +15,6 @@ type parsedLog struct {
     Timestamp   time.Time
     Name        string
     Event       string
-}
-
-func convertTimestamp(timestamp string) string {
-    i, err := strconv.ParseInt(timestamp, 10, 64)
-    if err != nil {
-        log.Fatal("Failed parsing timestamp: ", err)
-    }
-    time := time.Unix(i, 0).Format(time.UnixDate)
-    return time
 }
 
 func ReadLogFile(filePath string) *bufio.Scanner {
@@ -40,28 +29,32 @@ func ReadLogFile(filePath string) *bufio.Scanner {
 
 func ParseLogLine(line string) (parsedLog, error) {
     var parsedLine parsedLog
-    parsedLine.Timestamp = time.Date(2023, time.January, 30, 17, 36, 27, 0, time.UTC)
-    parsedLine.Name = "Plesoun"
-    parsedLine.Event = "fully connected"
-    fmt.Println(parsedLine)
-    return parsedLine, nil
-}
-
-func ParseLogFile(lines *bufio.Scanner, keyword string) map[string]string {
-    // keyword from logs, for example -> "[disconnect]" eventually use dedicated log (user.txt)
-    restruct := make(map[string]string)
-    lines.Split(bufio.ScanLines)
-    for lines.Scan() {
-        if strings.Contains(lines.Text(), keyword) == true {
-            text := lines.Text()
-            key := strings.Split(strings.Split(text, "username=")[1], "connection-type")[0]
-            timestamp := convertTimestamp(strings.Split(strings.Split(text, " , ")[1], ">")[0][:10])
-            restruct[key] = timestamp
-        }
+    // Find timestamp
+    startIndex := strings.Index(line, "[")
+    endIndex := strings.Index(line, "]")
+    if startIndex == -1 || endIndex == -1 {
+        return parsedLine, errors.New("invalid log format (timestmap)")
     }
-    return restruct
-//    return &discordgo.MessageSend{
-//        Content: fileLines,
+    timestampStr := line[startIndex+1 : endIndex]
+    timestamp, err := time.Parse("02-01-06 15:04:05", timestampStr[:len(timestampStr)-4])
+    if err != nil {
+        return parsedLine, errors.New("invalid timestamp")
+    }
+    parsedLine.Timestamp = timestamp
+
+    // Find connection details
+    startIndex = strings.Index(line, "\"")
+    endIndex = strings.LastIndex(line, "\"")
+    if startIndex == -1 || endIndex == -1 || startIndex == endIndex {
+        return parsedLine, errors.New("invalid log format (name)")
+    }
+    parsedLine.Name = line[startIndex+1 : endIndex]
+    if strings.Contains(line, "fully connected") {
+        parsedLine.Event = "fully connected"
+    } else {
+       return parsedLine, errors.New("event not found")
+    }
+    return parsedLine, nil
 }
 
 func getHordeSize(lines *bufio.Scanner, keyword string) []string {
