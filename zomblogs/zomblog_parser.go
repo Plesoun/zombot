@@ -24,6 +24,7 @@ func ReadLogFile(filePath string) *bufio.Scanner {
     if err != nil {
         log.Fatal("An error occured while reading a log file: ", err)
     }
+    defer cont.Close()
     return bufio.NewScanner(cont)
 }
 
@@ -59,23 +60,19 @@ func ParseLogLine(line string) (ParsedLog, error) {
     return parsedLine, nil
 }
 
-func getHordeSize(lines *bufio.Scanner, keyword string) []string {
-    // last horde size from logs
-    lines.Split(bufio.ScanLines)
-    var fileLines []string
-    for lines.Scan() {
-        if strings.Contains(lines.Text(), keyword) == true {
-            fileLines = append(fileLines, strings.Split(strings.Split(strings.Split(lines.Text(), ">")[2], " ")[4], ".")[0] + " zombies.")
-        }
-    }
-    return fileLines
-}
-
-func ParseLogFile(filePath string) []string {
+func ParseLogFile(filePath string) ([]ParsedLog, error) {
     lines := ReadLogFile(filePath)
-    lines.Split(bufio.ScanLines)
+    var parsedLogs []ParsedLog
     for lines.Scan() {
-        ParseLogLine(lines.Text())
+        parsedLogline, err := ParseLogLine(lines.Text())
+        if err != nil {
+            //handle error here (maybe log, maybe raise)
+            continue
+        }
+        parsedLogs = append(parsedLogs, parsedLogline)
     }
-    return nil
+    if err := lines.Err(); err != nil {
+        return nil, err
+    }
+    return parsedLogs, nil
 }
