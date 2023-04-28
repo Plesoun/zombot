@@ -7,40 +7,21 @@ import (
     "zombot/zomblogs"
 )
 
-type parsedLog struct {
-    Timestamp   time.Time
-    Name        string
-    Event       string
-}
-
 func TestParseLogLine(t *testing.T) {
-    logLine := `[30-01-23 17:36:27.662] 76561197995472465 "Plesoun" fully connected (10156,6640,0).`
-
-    expected := parsedLog{
-        Timestamp:  time.Date(2023, time.January, 30, 17, 36, 27, 0, time.UTC),
-        Name:       "Plesoun",
-        Event:      "fully connected",
-    }
-
-    result, err := parser.ParseLogLine(logLine)
-    if err != nil {
-        t.Fatalf("Error while parsing line: %v", err)
-    }
-
-    if !result.Timestamp.Equal(expected.Timestamp) {
-        t.Errorf("Expected timestamp: %v, got %v", expected.Timestamp, result.Timestamp)
-    }
-    if result.Name != expected.Name {
-        t.Errorf("Expected name: %v, got %v", expected.Name, result.Name)
-    }
-    if result.Event != expected.Event {
-        t.Errorf("Expected event: %v, got %v", expected.Event, result.Event)
-    }
-
-    errorCases := []struct {
+    testCases := []struct {
         logLine         string
+        expectedLog     parser.ParsedLog
         expectedError   error
     }{
+        {
+            logLine:        `[30-01-23 17:36:27.662] 76561197995472465 "Plesoun" fully connected (10156,6640,0).`,
+            expectedLog:    parser.ParsedLog{
+                Timestamp:  time.Date(2023, time.January, 30, 17, 36, 27, 0, time.UTC),
+                Name:       "Plesoun",
+                Event:      "fully connected",
+            },
+            expectedError:  nil,
+        },
         {
             logLine:        `[30-01-23 17:36:27.662] 76561197995472465 "Plesoun" connected (10156,6640,0).`,
             expectedError:  errors.New("event not found"),
@@ -51,10 +32,30 @@ func TestParseLogLine(t *testing.T) {
         },
     }
 
-    for _, testCase := range errorCases {
-        _, err := parser.ParseLogLine(testCase.logLine)
-        if err == nil || err.Error() != testCase.expectedError.Error() {
-            t.Errorf("Expected error: %v, got %v", testCase.expectedError, err)
+    for _, testCase := range testCases {
+        result, err := parser.ParseLogLine(testCase.logLine)
+        if err != nil {
+            if testCase.expectedError == nil || err.Error() != testCase.expectedError.Error() {
+                t.Fatalf("Unexpected error: %v", err)
+            }
+            // Error occurred and was expected, continue with the next test case
+            continue
+        }
+
+        if testCase.expectedError != nil {
+            t.Fatalf("Expected error %v, got no error", testCase.expectedError)
+        }
+
+        if !result.Timestamp.Equal(testCase.expectedLog.Timestamp) {
+            t.Errorf("Expected timestamp %v, got %v", testCase.expectedLog.Timestamp, result.Timestamp)
+        }
+
+        if result.Name != testCase.expectedLog.Name {
+            t.Errorf("Expected name %s, got %s", testCase.expectedLog.Name, result.Name)
+        }
+
+        if result.Event != testCase.expectedLog.Event {
+            t.Errorf("Expected event %s, got %s", testCase.expectedLog.Event, result.Event)
         }
     }
 }

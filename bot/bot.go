@@ -8,7 +8,7 @@ import (
     "os/exec"
     "os/signal"
     "strings"
-    "zombot/parser"
+    "zombot/zomblogs"
 )
 
 var (

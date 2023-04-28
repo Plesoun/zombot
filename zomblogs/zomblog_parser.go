@@ -3,6 +3,7 @@ package parser
 import (
     "bufio"
     "errors"
+    "fmt"
     //    "github.com/bwmarrin/discordgo"
     // There is a log/syslog package, explore that
     "log"
@@ -11,7 +12,7 @@ import (
     "time"
 )
 
-type parsedLog struct {
+type ParsedLog struct {
     Timestamp   time.Time
     Name        string
     Event       string
@@ -27,8 +28,8 @@ func ReadLogFile(filePath string) *bufio.Scanner {
 }
 
 
-func ParseLogLine(line string) (parsedLog, error) {
-    var parsedLine parsedLog
+func ParseLogLine(line string) (ParsedLog, error) {
+    var parsedLine ParsedLog
     // Find timestamp
     startIndex := strings.Index(line, "[")
     endIndex := strings.Index(line, "]")
@@ -36,6 +37,7 @@ func ParseLogLine(line string) (parsedLog, error) {
         return parsedLine, errors.New("invalid log format (timestamp)")
     }
     timestampStr := line[startIndex+1 : endIndex]
+    fmt.Println(timestampStr)
     timestamp, err := time.Parse("02-01-06 15:04:05", timestampStr[:len(timestampStr)-4])
     if err != nil {
         return parsedLine, errors.New("invalid timestamp")
@@ -69,12 +71,11 @@ func getHordeSize(lines *bufio.Scanner, keyword string) []string {
     return fileLines
 }
 
-func ProcessLogFile(filePath string, keyword string) []string {
+func ParseLogFile(filePath string) []string {
     lines := ReadLogFile(filePath)
-    switch {
-    case keyword == "wave":
-        return getHordeSize(lines, keyword)
-        // logins/logouts TODO: refactor
+    lines.Split(bufio.ScanLines)
+    for lines.Scan() {
+        ParseLogLine(lines.Text())
     }
     return nil
 }
