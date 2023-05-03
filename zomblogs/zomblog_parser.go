@@ -6,7 +6,6 @@ import (
     "fmt"
     //    "github.com/bwmarrin/discordgo"
     // There is a log/syslog package, explore that
-    "log"
     "os"
     "strings"
     "time"

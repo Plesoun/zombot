@@ -2,7 +2,6 @@ package tests
 
 import (
     "errors"
-    "fmt"
     "io/ioutil"
     "os"
     "reflect"
