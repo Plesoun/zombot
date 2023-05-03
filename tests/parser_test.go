@@ -70,10 +70,10 @@ func TestParseLogFile(t *testing.T) {
         expectedError error
     }{
         {
-            fileContent: `[30-01-23 17:36:27.662] 76561197995472465 "Plesoun" fully connected (10156,6640,0).`,
+            fileContent: `[23-01-23 17:36:27.662] 76561197995472465 "Plesoun" fully connected (10156,6640,0).`,
             expectedLogs: []parser.ParsedLog{
                 {
-                    Timestamp: time.Date(2030, time.January, 23, 17, 36, 27, 0, time.UTC),
+                    Timestamp: time.Date(2023, time.January, 23, 17, 36, 27, 0, time.UTC),
                     Name:      "Plesoun",
                     Event:     "fully connected",
                     },
