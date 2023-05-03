@@ -68,6 +68,7 @@ func ParseLogFile(filePath string) ([]ParsedLog, error) {
     var parsedLogs []ParsedLog
     for lines.Scan() {
         parsedLogline, err := ParseLogLine(lines.Text())
+        fmt.Println(parsedLogline)
         if err != nil {
             //handle error here (maybe log, maybe raise)
             continue

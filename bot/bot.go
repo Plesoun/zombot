@@ -42,19 +42,40 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
             }
             discord.ChannelMessageSend(message.ChannelID, string(out[:]))
         // see all logouts contained in the current log file TODO: limit to ~ last 10
-        case strings.Contains(message.Content, CommandPrefix +"logouts"):
-            for _, line := range parser.ProcessLogFile(DebugLogLocation, "[disconnect]") {
-                discord.ChannelMessageSend(message.ChannelID, line)
+        case strings.Contains(message.Content, CommandPrefix + "logouts"):
+            parsedLogs, err := parser.ParseLogFile(DebugLogLocation)
+            if err != nil {
+                log.Fatal("Error while parsing the log file:", err)
+            }
+            for _, logEntry := range parsedLogs {
+                if strings.Contains(logEntry.Event, "disconnected") {
+                    discord.ChannelMessageSend(message.ChannelID, fmt.Sprintf("%v %s %s", logEntry.Timestamp, logEntry.Name, logEntry.Event))
+                }
             }
         // see all logins contained in the current log file TODO: limit to ~ last 10
         // TODO: file location and name should be configurable (rather directory containing logs should
-        case strings.Contains(message.Content, CommandPrefix +"logins"):
-            data := parser.ParseLogFile(parser.ReadLogFile(DebugLogLocation), "[fully-connected]")
-                discord.ChannelMessageSendEmbed()
-        case strings.Contains(messaommandPrefix +"lasthorde"):
-            fmt.Print(DebugLogLocation)
-            line := parser.ProcessLogFile(DebugLogLocation, "wave")
-                discord.ChannelMessageSend(message.ChannelID, line[len(line)-1])
+        case strings.Contains(message.Content, CommandPrefix + "logins"):
+            parsedLogs, err := parser.ParseLogFile(DebugLogLocation)
+            if err != nil {
+                log.Fatal("Error while parsing log file:", err)
+            }
+            fmt.Print(parsedLogs)
+            for _, logEntry := range parsedLogs {
+                fmt.Println(logEntry.Event)
+                if strings.Contains(logEntry.Event, "fully connected") {
+                    discord.ChannelMessageSend(message.ChannelID, fmt.Sprintf("%v %s %s", logEntry.Timestamp, logEntry.Name, logEntry.Event))
+                }
+            }
+        case strings.Contains(message.Content, CommandPrefix +"lasthorde"):
+            parsedLogs, err := parser.ParseLogFile(DebugLogLocation)
+            if err != nil {
+                log.Fatal("Error while parsing the log file", err)
+            }
+            for _, logEntry := range parsedLogs {
+                if strings.Contains(logEntry.Event, "wave") {
+                    discord.ChannelMessageSend(message.ChannelID, fmt.Sprintf("%v %s %s", logEntry.Timestamp, logEntry.Name, logEntry.Event))
+                }
+            }
     }
 }
 
@@ -66,7 +87,7 @@ func Run() {
     discord.AddHandler(newMessage)
     discord.Open()
     defer discord.Close()
-    log.Println("Running...")
+    log.Println(`Running...`)
     c := make(chan os.Signal, 1)
     signal.Notify(c, os.Interrupt)
     <-c
