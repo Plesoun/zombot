@@ -95,8 +95,6 @@ func TestParseLogFile(t *testing.T) {
     if err != nil {
         t.Fatal("Failed to write content to temp file: ", err)
     }
-    fmt.Println(tempFile.Name())
-    tempFile.Close()
 
     result, err := parser.ParseLogFile(tempFile.Name())
     if err != testCase.expectedError && (err == nil || testCase.expectedError == nil || err.Error() != testCase.expectedError.Error()) {
