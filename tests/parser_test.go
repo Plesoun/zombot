@@ -2,7 +2,9 @@ package tests
 
 import (
     "errors"
+    "fmt"
     "io/ioutil"
+    "os"
     "reflect"
     "testing"
     "time"
@@ -63,26 +65,27 @@ func TestParseLogLine(t *testing.T) {
 }
 
 func TestParseLogFile(t *testing.T) {
-    testCases := struct[] {
-        fileContent     string
-        expectedLogs    []ParsedLog
-        expectedError   error
+    testCases := []struct {
+        fileContent   string
+        expectedLogs  []parser.ParsedLog
+        expectedError error
     }{
         {
             fileContent: `[30-01-23 17:36:27.662] 76561197995472465 "Plesoun" fully connected (10156,6640,0).`,
-            expectedLogs: []ParsedLog{
-        {
-            Timestamp: time.Date(2030, time.January, 23, 17, 36, 27, 0, time.UTC),
-            Name:      "Plesoun",
-            Event:     "fully connected",
-        },
-        },
-            expectedError: nil,
-        },
-        // Add more test cases here
+            expectedLogs: []parser.ParsedLog{
+                {
+                    Timestamp: time.Date(2030, time.January, 23, 17, 36, 27, 0, time.UTC),
+                    Name:      "Plesoun",
+                    Event:     "fully connected",
+                    },
+                    },
+                    expectedError: nil,
+                    },
+                    // Add more test cases here
     }
+
     for _, testCase := range testCases {
-        tempFile, err := ioutil.Tempfile("", "test-log-")
+        tempFile, err := ioutil.TempFile("", "test-log-")
         if err != nil {
             t.Fatal("Failed to create temp file: ", err)
     }
@@ -92,6 +95,7 @@ func TestParseLogFile(t *testing.T) {
     if err != nil {
         t.Fatal("Failed to write content to temp file: ", err)
     }
+    fmt.Println(tempFile.Name())
     tempFile.Close()
 
     result, err := parser.ParseLogFile(tempFile.Name())

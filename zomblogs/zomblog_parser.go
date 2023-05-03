@@ -18,14 +18,14 @@ type ParsedLog struct {
     Event       string
 }
 
-func ReadLogFile(filePath string) *bufio.Scanner {
-    // Read file into a buffio Scanner object/iterator
+func ReadLogFile(filePath string) (*bufio.Scanner, *os.File, error) {
+    // Read file into a buffio Scanner object/iterator.
+    //!! This means caller is responsible for closing the file
     cont, err := os.Open(filePath)
     if err != nil {
-        log.Fatal("An error occured while reading a log file: ", err)
+        return nil, nil, fmt.Errorf("an error occured while reading the log file: %w", err)
     }
-    defer cont.Close()
-    return bufio.NewScanner(cont)
+    return bufio.NewScanner(cont), cont, nil
 }
 
 
@@ -38,7 +38,6 @@ func ParseLogLine(line string) (ParsedLog, error) {
         return parsedLine, errors.New("invalid log format (timestamp)")
     }
     timestampStr := line[startIndex+1 : endIndex]
-    fmt.Println(timestampStr)
     timestamp, err := time.Parse("02-01-06 15:04:05", timestampStr[:len(timestampStr)-4])
     if err != nil {
         return parsedLine, errors.New("invalid timestamp")
@@ -61,7 +60,12 @@ func ParseLogLine(line string) (ParsedLog, error) {
 }
 
 func ParseLogFile(filePath string) ([]ParsedLog, error) {
-    lines := ReadLogFile(filePath)
+    lines, cont, err := ReadLogFile(filePath)
+    if err != nil {
+        return nil, err
+    }
+    defer cont.Close()
+
     var parsedLogs []ParsedLog
     for lines.Scan() {
         parsedLogline, err := ParseLogLine(lines.Text())
