@@ -26,6 +26,15 @@ func TestParseLogLine(t *testing.T) {
             expectedError:  nil,
         },
         {
+            logLine:        `[24-01-23 18:11:33.354] 76561198005644659 "Toch" disconnected player (6806,5416,1).`,
+            expectedLog:    parser.ParsedLog{
+                Timestamp:  time.Date(2023, time.January, 24, 18, 11, 33, 0, time.UTC),
+                Name:       "Toch",
+                Event:      "disconnected player (6806,5416,1).",
+                },
+                expectedError:  nil,
+        },
+        {
             logLine:        `[30-01-23 17:36:27.662] 76561197995472465 "Plesoun" connected (10156,6640,0).`,
             expectedError:  errors.New("event not found"),
         },
