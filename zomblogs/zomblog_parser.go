@@ -50,8 +50,11 @@ func ParseLogLine(line string) (ParsedLog, error) {
         return parsedLine, errors.New("invalid log format (name)")
     }
     parsedLine.Name = line[startIndex+1 : endIndex]
-    if strings.Contains(line, "fully connected") {
-        parsedLine.Event = "fully connected"
+    // Extracting the player based event here
+    eventStartIndex := endIndex + 2
+    eventEndIndex := strings.LastIndex(line, "(")
+    if eventStartIndex < len(line) {
+        parsedLine.Event = line[eventStartIndex:eventEndIndex -1]
     } else {
        return parsedLine, errors.New("event not found")
     }
