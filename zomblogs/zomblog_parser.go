@@ -4,7 +4,6 @@ import (
     "bufio"
     "errors"
     "fmt"
-    //    "github.com/bwmarrin/discordgo"
     // There is a log/syslog package, explore that
     "os"
     "strings"
